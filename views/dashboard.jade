@@ -1,0 +1,285 @@
+//
+   Created by Adrian on 4/6/2016.
+
+extends layout
+block content
+    nav.navbar.navbar-default.navbar-fixed-top
+        .container-fluid
+            // Brand and toggle get grouped for better mobile display
+            .navbar-header
+                button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
+                    span.sr-only Toggle navigation
+                    span.icon-bar
+                    span.icon-bar
+                    span.icon-bar
+
+                if session.admin
+                    span.text-holder.brand ADMIN DASHBOARD
+                else
+                    span.text-holder.brand DASHBOARD
+            // Collect the nav links, forms, and other content for toggling
+            .collapse.navbar-collapse.content-toggle
+                ul.nav.navbar-nav
+                    if !session.admin
+                        li.hidden
+                            a.manage_accounts_link(href='#', data-item='account_list') Action
+                        li.active
+                            a(href='#', data-item='client_list') HOME
+
+                ul.nav.navbar-nav.navbar-right
+                    li
+                        span.text-holder
+                            | #{session.user}
+                            if session.admin
+                                | &nbsp; (admin)
+                            | ,
+                    li
+                        a(href='logout') LOG OUT
+            // /.navbar-collapse
+        // /.container-fluid
+
+    .content.container
+        if session.admin
+            .item#employee_list.active
+                h2.text-center Employees list
+                button.add-user.btn.pull-right
+                    i.fa.fa-user-plus(aria-hidden='true')
+                        |   Add user
+
+                .user-entries
+                    .entry.col-md-12.hidden
+                        .avatar-holder.col-md-1
+                        .user-info.col-md-10
+                            .name John Doe
+                            .email
+                            .phone
+                        .btn.btn-primary.remove-user.pull-right
+                            i.fa.fa-trash(aria-hidden='true')
+                                |   Delete user
+                        .btn.btn-primary.edit-user.pull-right
+                            i.fa.fa-pencil(aria-hidden='true')
+                                |   Edit user profile
+                        .btn.btn-primary.view-report.pull-right
+                            i.fa.fa-book(aria-hidden='true')
+                                |   View report
+        else
+            .item#client_list.active
+                h2.text-center Clients list
+                button.add-client.btn.pull-right
+                    i.fa.fa-user-plus(aria-hidden='true')
+                        |   Add client
+
+                .client-entries
+                    .entry.col-md-12.hidden
+                        .client-info.col-md-10
+                            .name John Doe
+                            .id_card_number
+                            .cnp
+                            .address
+                            .phone
+                            .email
+                        .btn.btn-primary.edit-client.pull-right
+                            i.fa.fa-pencil(aria-hidden='true')
+                                |   Edit client profile
+                        .btn.btn-primary.manage-accounts.pull-right
+                            i.fa.fa-book(aria-hidden='true')
+                                |   Manage accounts
+
+            .item#account_list
+                h2.title.text-center Manage account
+                button.add-account.btn.pull-right
+                    i.fa.fa-user-plus(aria-hidden='true')
+                        |   Add account
+                .account-entries
+                    .entry.col-md-12.hidden
+                        .client-info.col-md-10
+                            .name
+                            .type
+                            .amount
+                            .created-date
+                        .btn.btn-primary.remove-account.pull-right
+                            i.fa.fa-trash(aria-hidden='true')
+                                |   Delete account
+                        .btn.btn-primary.edit-account.pull-right
+                            i.fa.fa-pencil(aria-hidden='true')
+                                |   Edit account info
+                        .btn.btn-primary.new-transaction.pull-right
+                            i.fa.fa-credit-card(aria-hidden='true')
+                                |   New transaction
+
+
+
+    // MODALS
+    .modal#edit-user-modal.fade(tabindex='-1', role='dialog')
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') X
+                    h4.modal-title.text-center Edit employee info
+                .modal-body
+                    form#user_info(role='form')
+                        .alert.alert-success.text-center Your changes have been saved.
+                        .form-group.hidden
+                            input.form-control(type='text', name='id')
+                        .form-group
+                            label(for='first_name') First Name:
+                            input#first_name.form-control(type='text', name='first_name' placeholder='First Name')
+                        .form-group
+                            label(for='last_name') Last Name:
+                            input#last_name.form-control(type='text', name='last_name' placeholder='Last Name')
+                        .form-group
+                            label(for='birth_date') Birth Date:
+                            input#birth_date.form-control(type='text', name='birth_date' placeholder='Birth Date')
+                        .form-group
+                            label(for='phone') Phone:
+                            input#phone.form-control(type='text', name='phone' placeholder='Phone')
+                        .form-group
+                            label(for='email') Email:
+                            input#email.form-control(type='email', name='email' placeholder='Email')
+                .modal-footer
+                    button.btn.btn-default(type='button', data-dismiss='modal') Close
+                    button.btn.btn-primary#save_user_info(type='button') Save changes
+            // /.modal-content
+        // /.modal-dialog
+    // /.modal
+
+    .modal#reports-modal.fade(tabindex='-1', role='dialog')
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') X
+                    h4.modal-title.text-center View employee report
+                .modal-body
+                    form#report-form(role='form')
+                        .form-group.hidden
+                            input.form-control(type='text', name='user_id')
+                        .form-group
+                            label(for='start_date') Start date:
+                            input#start_date.form-control(type='text', name='start_date' placeholder='Start Date')
+                        .form-group
+                            label(for='end_date') End Date:
+                            input#end_date.form-control(type='text', name='end_date' placeholder='End Date')
+
+                    #reports-list
+                        .report-entry.col-md-12.hidden.head
+                            .col-md-1.user Performed by
+                            .col-md-1.type Transaction type
+                            .col-md-1.amount Amount
+                            .col-md-4.from From
+                            .col-md-4.to To
+                            .col-md-1.date Created at
+
+                .modal-footer
+                    button.btn.btn-default(type='button', data-dismiss='modal') Close
+                    button.btn.btn-primary#generate-report(type='button') Generate report
+            // /.modal-content
+        // /.modal-dialog
+    // /.modal
+
+
+    .modal#edit-client-modal.fade(tabindex='-1', role='dialog')
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') X
+                    h4.modal-title.text-center Edit client profile
+                .modal-body
+                    form#client_info(role='form')
+                        .alert.alert-success.text-center Your changes have been saved.
+                        .form-group.hidden
+                            input.form-control(type='text', name='id')
+                        .form-group
+                            label(for='name') Full Name:
+                            input#name.form-control(type='text', name='name' placeholder='Full Name')
+                        .form-group
+                            label(for='id_card_number') Identity card number:
+                            input#id_card_number.form-control(type='text', name='id_card_number' placeholder='Identity card number')
+                        .form-group
+                            label(for='cnp') Personal Numerical Code:
+                            input#cnp.form-control(type='text', name='cnp' placeholder='Personal Numerical Code')
+                        .form-group
+                            label(for='address') Address:
+                            input#address.form-control(type='text', name='address' placeholder='Address')
+                        .form-group
+                            label(for='phone') Phone:
+                            input#phone.form-control(type='text', name='phone' placeholder='Phone')
+                        .form-group
+                            label(for='email') Email:
+                            input#email.form-control(type='email', name='email' placeholder='Email')
+                .modal-footer
+                    button.btn.btn-default(type='button', data-dismiss='modal') Close
+                    button.btn.btn-primary#save_client_info(type='button') Save changes
+            // /.modal-content
+        // /.modal-dialog
+    // /.modal
+
+    .modal#edit-account-modal.fade(tabindex='-1', role='dialog')
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') X
+                    h4.modal-title.text-center Edit account information
+                .modal-body
+                    form#account_info(role='form')
+                        .alert.alert-success.text-center Your changes have been saved.
+                        .form-group.hidden
+                            input.form-control(type='text', name='account_id')
+                        .form-group.hidden
+                            input.form-control(type='text', name='client_id')
+                        .form-group
+                            label(for='type') Type:
+                            select#type.form-control(name='account_type')
+                                option(value='debit') Debit
+                                option(value='credit') Credit
+                                option(value='savings') Savings
+                        .form-group
+                            label(for='money_amount') Blance:
+                            input#money_amount.form-control(type='text', name='money_amount' placeholder='Balance')
+                .modal-footer
+                    button.btn.btn-default(type='button', data-dismiss='modal') Close
+                    button.btn.btn-primary#save_account_info(type='button') Save changes
+            // /.modal-content
+        // /.modal-dialog
+    // /.modal
+
+    .modal#transaction-modal.fade(tabindex='-1', role='dialog')
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') X
+                    h4.modal-title.text-center Create a new transaction
+                .modal-body
+                    form#transaction_form(role='form')
+                        .alert.alert-success.text-center Your transaction was processed successfully.
+                        .form-group(style="padding-bottom: 20px;")
+                            label(for='transaction_type') Transaction type:
+                            select#transaction_type.form-control(name='type')
+                                option(value='transfer') Transfer
+                                option(value='payment') Payment
+                        .form-group
+                            label(for='from') From:
+                            input.form-control.disabled(type='text', name='from')
+                        .form-group
+                            label(for='select_accounts') Transfer to:
+                            select#select_accounts.to.form-control(name='to')
+                            select#bill.form-control.bill.hidden(name='bill')
+                                option(value='electricity') Electricity
+                                option(value='gas') Gas
+                                option(value='phone') Phone
+                                option(value='tv') TV
+                                option(value='internet') Internet
+                        .form-group
+                            label(for='amount') Amount:
+                            input#amount.form-control(type='text', name='amount')
+
+                .modal-footer
+                    button.btn.btn-default(type='button', data-dismiss='modal') Close
+                    button.btn.btn-primary#process_transfer(type='button') Process
+            // /.modal-content
+        // /.modal-dialog
+    // /.modal
