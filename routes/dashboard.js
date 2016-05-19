@@ -14,16 +14,16 @@ router.get('/', function(req, res, next) {
     res.render('dashboard', { title: 'Dashboard' });
 });
 
-router.get('/employee_list', adminController.getEmployeeList);
+router.get('/user_list', adminController.getUserList);
 
-router.get('/employee', adminController.getEmployee);
+router.get('/user/:id', adminController.getUser);
 
-router.put('/employee', adminController.updateEmployee);
+router.put('/user', adminController.updateUser);
 
-router.post('/employee', adminController.createEmployee);
+router.post('/user', adminController.createUser);
 
-router.delete('/employee/:id', adminController.deleteEmployee);
+router.delete('/user/:id', adminController.deleteUser);
 
-router.get('/employee/report/:id', adminController.getEmployeeReport);
+router.get('/books/report/:id', adminController.getBooksReport);
 
 module.exports = router;

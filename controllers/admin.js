@@ -1,46 +1,40 @@
 /**
  * Created by adrianpogacean on 5/12/2016.
  */
+'use strict';
+
+const UserModel = require('../models/user');
+const Books = require('../models/book');
+
 
 const admin = {
-    getEmployeeList: function(req, res, next) {
-        var User = db.model('user');
+    getUserList: function(req, res, next) {
+        var User = new UserModel(),
+            users;
 
-        User.findAll({
-            //where: {
-            //    is_admin: 0
-            //}
-        }).then(function(userObj) {
-            if(userObj) {
-                res.send({type: 'success', users: userObj});
-            }
-        }).error(function(e) {
-            log.warn("Could not read users.");
-            log.error(e);
-            return res.error(500, "SERVER_ERROR");
-        });
+        users = User.getAll();
+        if(users) {
+            res.send({type: 'success', users: users});
+        } else {
+            res.send({type: 'error', message: 'No users found'});
+        }
     },
 
-    getEmployee:  function(req, res, next) {
-        var User = db.model('user'),
-            params = req.query;
-        User.find({
-            where: {
-                id: params.user_id
-            }
-        }).then(function(userObj) {
-            if(userObj) {
-                res.send({type: 'success', user: userObj});
-            }
-        }).error(function(e) {
-            log.warn("Could not read user based on id.");
-            log.error(e);
-            return res.error(500, "SERVER_ERROR");
-        });
+    getUser:  function(req, res, next) {
+        var User = new UserModel(),
+            id = req.params.id,
+            userObj;
+
+        userObj = User.getUserById(id);
+        if(userObj) {
+            res.send({type: 'success', user: userObj});
+        } else {
+            res.send({type: 'error', message: 'No user found'});
+        }
     },
 
-    updateEmployee: function(req, res, next) {
-        var User = db.model('user'),
+    updateUser: function(req, res, next) {
+        var User = new UserModel(),
             params = req.body,
             id = params.id;
 
@@ -59,50 +53,40 @@ const admin = {
         });
     },
 
-    createEmployee: function(req, res, next) {
-        var User = db.model('user'),
-            params = req.body,
+    createUser: function(req, res, next) {
+        var params = req.body,
             firstName = params.first_name || '',
             lastName = params.last_name || '';
 
-        params.date = new Date(Date.parse(params.date));
-        params.username = firstName+lastName;
+        console.log('PARAMS : ', params);
+
+        params.username = params.username ? params.username : firstName+lastName;
+
         params.password = params.username;
 
-        User.create(params).then(function(userObj) {
-            console.log('arguments ', arguments);
-            if(userObj) {
-                res.send({type: 'success', user: userObj});
-            }
-        }).error(function(e) {
-            log.warn("Could not create user.");
-            log.error(e);
-            return res.error(500, "SERVER_ERROR");
-        });
+        const User = new UserModel(params);
+
+        console.log('USER IN CONTROLLER : ', User);
+
+        var userObj = User.create();
+        console.log('USER OBJ: ',userObj);
+        if(userObj) {
+            res.send({type: 'success', user: userObj});
+        } else {
+            res.send({type: 'error', message: 'Could not create user'});
+        }
     },
 
-    deleteEmployee: function(req, res, next) {
-        var User = db.model('user');
-        var id = req.params.id
-        console.log('ID', id);
+    deleteUser: function(req, res, next) {
+        const User = new UserModel();
+        var id = req.params.id;
 
-        User.find({
-            where: {
-                id: id
-            }
-        }).then(function(user) {
-            console.log('USER ', user);
-            user.destroy().then(function() {
-                res.send({type: 'success'});
-            });
-        }).error(function(e) {
-            log.warn("Could not delete user.");
-            log.error(e);
-            return res.error(500, "SERVER_ERROR");
-        });
+        var deleted = User.deleteUser(id);
+
+        res.send({type: deleted ? 'success' : 'error'});
     },
 
-    getEmployeeReport: function(req, res, next) {
+    getBooksReport: function(req, res, next) {
         var Transaction = db.model('transaction');
         var User = db.model('user');
         var userId = req.params.id;
